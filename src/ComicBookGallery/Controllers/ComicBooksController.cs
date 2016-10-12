@@ -1,32 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.EnterpriseServices;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using System.Web.Mvc;
+using ComicBookGallery.Data;
+using ComicBookGallery.Models;
 
 namespace ComicBookGallery.Controllers
 {
     public class ComicBooksController : Controller
     {
-        //[ActionName("my-detail")]
-        public ActionResult Detail()
+
+        private
+          ComicBookRepository _comicBookRepository = null;
+
+        public ComicBooksController()
         {
+            _comicBookRepository = new ComicBookRepository();
+        }
 
-            ViewBag.SeriesTitle = "The Amazing Spider-Man";
-            ViewBag.IssueNumber = 700;
-            ViewBag.Description = "<p>Final issue! Witness the final hours of Doctor Octopus' life and his one, last, great act of revenge! Even if Spider-Man survives... <strong>will Peter Parker?</strong></p>";
-            ViewBag.Artists = new string[]
+        public ActionResult Index()
+        {
+            var comicBooks = _comicBookRepository.GetComicBooks();
+            return View(comicBooks);
+        }
+
+        //[ActionName("my-detail")]
+        public ActionResult Detail(int? id)
+        {
+            if (id == null)
             {
-                "Script: Dan Slott",
-                "Pencils: Humberto Ramos",
-                "Inks: Victor Olazaba",
-                "Colors: Edgar Delgado",
-                "Letters: Chris Eliopoulos"
-            };
+                return HttpNotFound();
+            }
 
-
-
-            return View();
+            var comicBook = _comicBookRepository.GetComicBook((int)id);
+            
+            return View(comicBook);
         }
     }
 }
